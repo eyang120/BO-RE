@@ -86,6 +86,14 @@ if st.sidebar.checkbox("Display LASSO-selected features", False):
 st.sidebar.subheader("Choose model:")
 model_select = st.sidebar.selectbox("Model", ("Linear", "Random Forest", "SVR", "Ridge", "Neutral Net", "XGBoost"))
 
+st.sidebar.subheader("Tune model:")
+with st.sidebar:
+    for column in x_train.columns:
+        feature_min = float(np.min(x_train[column]))
+        feature_max = float(np.max(x_train[column]))
+        st.slider(f"{str(column)}", feature_min, feature_max, value=(feature_min, feature_max))
+    
+
 @st.cache_data(persist=True)
 def linear_model(x_train, x_test, y_train, y_test):
     
@@ -117,8 +125,6 @@ def linear_model(x_train, x_test, y_train, y_test):
     st.write("Average R^2: ", np.mean(cv_r2_scores))
     st.write("\nTest RMSE: ", test_rmse)
     st.write("Test R^2: ", test_r2)
-    add_sliders(x_train)
-
 
 def random_forest(x_train, x_test, y_train, y_test):
     rf_regressor = RandomForestRegressor(n_estimators=350)
@@ -209,14 +215,7 @@ def ridge_model(x_train, x_test, y_train, y_test):
     st.write("\nTest RMSE: ", test_rmse)
     st.write("Test R^2: ", test_r2)
 
-def add_sliders(x_train):
-    feature_sliders = []
-    for column in x_train.columns:
-        feature_min = np.min(x_train[column])
-        feature_max = np.max(x_train[column])
-        feature_slider = st.slider(f"{column}", feature_min, feature_max, value=(feature_min, feature_max))
-        feature_sliders.append(feature_slider)
-    return feature_sliders
+
 
 if st.button("Run Model"):
     match model_select:
