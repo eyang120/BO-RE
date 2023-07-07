@@ -87,12 +87,13 @@ st.sidebar.subheader("Choose model:")
 model_select = st.sidebar.selectbox("Model", ("Linear", "Random Forest", "SVR", "Ridge", "Neutral Net", "XGBoost"))
 
 st.sidebar.subheader("Tune model:")
+column_values = {}
 with st.sidebar:
     for column in x_train.columns:
         feature_min = float(np.min(x_train[column]))
         feature_max = float(np.max(x_train[column]))
-        st.slider(f"{str(column)}", feature_min, feature_max, value=(feature_min, feature_max))
-    
+        value = st.slider(f"{str(column)}", min_value=feature_min, max_value=feature_max)
+        column_values[f"{column}"] = value
 
 @st.cache_data(persist=True)
 def linear_model(x_train, x_test, y_train, y_test):
