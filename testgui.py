@@ -237,3 +237,4 @@ if st.button("Run Model"):
             pass
         case "XGBoost":
             pass
+    predict_button = st.button("Predict")
