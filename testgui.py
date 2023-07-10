@@ -11,9 +11,13 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 import mpld3
 import streamlit.components.v1 as components
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import xgboost as xgb
 
 st.title('Bogalusa Reduction Efficiency Model')
-st.sidebar.title('Toggle display')
+st.sidebar.title('Options')
 
 def correct_dtypes(df: pd.DataFrame):
     """
@@ -62,7 +66,7 @@ df = load()
 x = df.drop("RE test", axis = 1)
 y = df["RE test"]
 
-
+st.sidebar.subheader("Toggle display")
 if st.sidebar.checkbox("Display data", False):
     st.subheader("Bogalusa Reduction Efficiency Dataset")
     st.write(df)
@@ -221,6 +225,135 @@ def ridge_model(x_train, x_test, y_train, y_test):
     st.write("\nTest RMSE: ", test_rmse)
     st.write("Test R^2: ", test_r2)
 
+def neural_net(x_train, x_test, y_train, y_test):
+    epoch_losses = []
+    predicted_values = []
+
+    x_train_array = x_train.values
+    y_train_array = y_train.values
+    x_test_array = x_test.values
+
+    x_train_tensor = torch.from_numpy(x_train_array).float()
+    y_train_tensor = torch.from_numpy(y_train_array).float()
+    x_test_tensor = torch.from_numpy(x_test_array).float()
+
+    x_train, x_val, y_train, y_val = train_test_split(x_train_tensor, y_train_tensor, test_size=0.2, random_state=43)
+
+    class NeuralNet(nn.Module):
+        def __init__(self, input_size):
+            super(NeuralNet, self).__init__()
+            self.fc1 = nn.Linear(input_size, 64)
+            self.fc2 = nn.Linear(64, 64)
+            self.fc3 = nn.Linear(64, 1)
+            
+        def forward(self, x):
+            x = torch.relu(self.fc1(x))
+            x = torch.relu(self.fc2(x))
+            x = self.fc3(x)
+            return x
+
+    model = NeuralNet(input_size=x_train_tensor.shape[1])
+
+    criterion = nn.MSELoss()
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
+
+
+    num_epochs = 100
+    batch_size = 32
+
+
+    for epoch in range(num_epochs):
+        running_loss = 0.0
+        for i in range(0, len(x_train), batch_size):
+            inputs = x_train[i:i+batch_size]
+            labels = y_train[i:i+batch_size]
+
+            optimizer.zero_grad()
+
+            outputs = model(inputs)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
+
+            running_loss += loss.item()
+
+        epoch_losses.append(running_loss)
+
+        st.write('Epoch [%d/%d], Loss: %.4f' % (epoch+1, num_epochs, running_loss))
+
+        if (epoch+1) % 20 == 0:
+            model.eval()
+            with torch.no_grad():
+                y_pred = model(x_val)
+                predicted_values.append(y_pred)
+
+                fig = plt.scatter(y_val, y_pred)
+                plt.xlabel('Actual y')
+                plt.ylabel('Predicted y')
+                plt.title('Predicted vs Actual (Epoch %d)' % (epoch+1))
+                st.pyplot(fig)
+                fig.clf()
+
+    fig = plt.figure()
+    plt.plot(range(num_epochs), epoch_losses)
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.title('Epoch Loss')
+    st.pyplot(fig)
+    fig.clf()
+
+    model.eval()
+    with torch.no_grad():
+        y_pred = model(x_test_tensor).numpy()
+
+    rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+    st.write("Test RMSE:", rmse)
+
+
+    model.eval()
+    with torch.no_grad():
+        y_pred = model(x_val)
+        val_loss = criterion(y_pred, y_val)
+        val_rmse = torch.sqrt(val_loss).item()
+        st.write("Validation RMSE:", val_rmse)
+
+
+    model.eval()
+    with torch.no_grad():
+        y_pred = model(x_test_tensor).numpy()
+
+    rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+    st.write("Test RMSE:", rmse)
+
+def xgboost(x_train, x_test, y_train, y_test):
+    xgb_model = xgb.XGBRegressor()
+
+    cv_mse_scores = -cross_val_score(xgb_model, x_train, y_train, scoring='neg_mean_squared_error', cv=5)
+    cv_r2_scores = cross_val_score(xgb_model, x_train, y_train, scoring='r2', cv=5)
+
+    xgb_model.fit(x_train, y_train)
+    y_pred = xgb_model.predict(x_test)
+
+    rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+    st.write("RMSE:", rmse)
+
+    r2 = r2_score(y_test, y_pred)
+    st.write("R2 score:", r2)
+
+    fig = plt.figure()
+    plt.scatter(y_pred, y_test, color='blue', label="Actual")
+    plt.title("XGBoost Regression - Actual vs Predicted")
+    plt.xlabel("Predicted values")
+    plt.ylabel("Actual values")
+    plt.legend()
+    st.pyplot(fig)
+
+    st.write("Cross-Validation MSE Scores:")
+    st.write(cv_mse_scores)
+    st.write("Average MSE: ", np.mean(cv_mse_scores))
+    st.write("\nCross-Validation R^2 Scores:")
+    st.write(cv_r2_scores)
+    st.write("Average R^2: ", np.mean(cv_r2_scores))
 
 
 if st.button("Run Model"):
@@ -234,7 +367,7 @@ if st.button("Run Model"):
         case "Ridge":
             ridge_model(x_train, x_test, y_train, y_test)
         case "Neural Net":
-            pass
+            neural_net(x_train, x_test, y_train, y_test)
         case "XGBoost":
-            pass
+            xgboost(x_train, x_test, y_train, y_test)
     predict_button = st.button("Predict")
