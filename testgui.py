@@ -17,7 +17,7 @@ import torch.optim as optim
 import xgboost as xgb
 import modeling 
 
-st.title('Bogalusa Reduction Efficiency Model')
+st.title('Bogalusa Reduction Efficiency Modelling')
 st.sidebar.title('Options')
 
 @st.cache_data(persist= True)
@@ -372,9 +372,9 @@ def retrieve_slider_values():
         slider_values[column] = st.session_state[f"col{i}"]
         # st.write(slider_values[column])
 
-run_button = st.button("Run Model")
-predict_button = st.button("Predict")
-if run_button:
+run_check = st.checkbox("Run Model")
+predict_check = st.checkbox("Predict")
+if run_check:
     match model_select:
         case "Linear":
             linear_model(x_train, x_test, y_train, y_test)
@@ -390,7 +390,7 @@ if run_button:
             xgboost(x_train, x_test, y_train, y_test)
 
 
-if predict_button: 
+if predict_check: 
     retrieve_slider_values()
     new_row = pd.DataFrame(slider_values, index=[0])
     x_test2 = pd.concat([x_test, new_row], ignore_index=True)
