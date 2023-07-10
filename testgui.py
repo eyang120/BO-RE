@@ -352,10 +352,10 @@ def xgboost(x_train, x_test, y_train, y_test):
     st.pyplot(fig)
 
     st.write("Cross-Validation MSE Scores:")
-    st.write(cv_mse_scores)
+    st.write(cv_mse_scores[np.newaxis])
     st.write("Average MSE: ", np.mean(cv_mse_scores))
     st.write("\nCross-Validation R^2 Scores:")
-    st.write(cv_r2_scores)
+    st.write(cv_r2_scores[np.newaxis])
     st.write("Average R^2: ", np.mean(cv_r2_scores))
 
 
