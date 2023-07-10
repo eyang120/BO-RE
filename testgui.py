@@ -79,7 +79,7 @@ def linear_predict(x_train, x_test, y_train):
     y_pred = lr.predict(x_test)
     st.write(f"Predicted reduction efficiency based off slider values: {y_pred[-1]}%")
 
-    
+
 def linear_model(x_train, x_test, y_train, y_test):
     
     lr = LinearRegression()
@@ -184,7 +184,7 @@ def svr_model(x_train, x_test, y_train, y_test):
     st.write("Test R^2: ", test_r2)
 
 
-def ridge_predict(x_train, x_test, y_train, y_test):
+def ridge_predict(x_train, x_test, y_train):
     ridge = Ridge(alpha=1.0)
     ridge.fit(x_train, y_train)
     y_pred = ridge.predict(x_test)
@@ -319,8 +319,8 @@ def neural_net(x_train, x_test, y_train, y_test):
         y_pred = model(x_test_tensor).numpy()
 
     rmse = np.sqrt(mean_squared_error(y_test, y_pred))
-    st.write("Test RMSE:", rmse)
-
+    st.write("Test RMSE:", rmse)    
+    st.write("Test R2:", r2_score(y_test, y_pred))
 
 def xgboost_predict(x_train, x_test, y_train):
     xgb_model = xgb.XGBRegressor()
