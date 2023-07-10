@@ -90,8 +90,8 @@ st.sidebar.subheader("Tune model:")
 column_values = {}
 with st.sidebar:
     for column in x_train.columns:
-        feature_min = float(np.min(x_train[column]))
-        feature_max = float(np.max(x_train[column]))
+        feature_min = float(np.min(x_train[column]) - 5.0) 
+        feature_max = float(np.max(x_train[column]) + 5.0) 
         value = st.slider(f"{str(column)}", min_value=feature_min, max_value=feature_max)
         column_values[f"{column}"] = value
 
