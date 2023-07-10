@@ -44,7 +44,7 @@ def feature_selection(data, x, y):
     return selected_df
 
 selected_df = feature_selection(df, x, y)
-x_train, x_test, y_train, y_test = train_test_split(selected_df, y, test_size=0.3)
+x_train, x_test, y_train, y_test = train_test_split(selected_df, y, test_size=0.3, random_state=24)
 
 
 if st.sidebar.checkbox("Display LASSO-selected features", False):
