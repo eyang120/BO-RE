@@ -358,6 +358,13 @@ def xgboost(x_train, x_test, y_train, y_test):
     st.write("Average R^2: ", np.mean(cv_r2_scores))
 
 
+slider_values = {}
+def retrieve_slider_values(): 
+    for i in range(len(x_train.columns)): 
+        column = x_train.columns[i] 
+        slider_values[column] = st.session_state[f"col{i}"]
+
+
 if st.button("Run Model"):
     match model_select:
         case "Linear":
@@ -373,5 +380,6 @@ if st.button("Run Model"):
         case "XGBoost":
             xgboost(x_train, x_test, y_train, y_test)
     predict_button = st.button("Predict")
-    if predict_button: 
-        pass
+if predict_button: 
+    retrieve_slider_values()
+    
