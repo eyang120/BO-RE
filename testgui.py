@@ -77,8 +77,9 @@ def linear_predict(x_train, x_test, y_train):
     lr = LinearRegression()
     lr.fit(x_train, y_train)
     y_pred = lr.predict(x_test)
-    st.write(f"y_pred based off slider values: {y_pred[-1]}")
+    st.write(f"Predicted reduction efficiency based off slider values: {y_pred[-1]}%")
 
+    
 def linear_model(x_train, x_test, y_train, y_test):
     
     lr = LinearRegression()
@@ -115,8 +116,7 @@ def rf_predict(x_train, x_test, y_train):
     rf_regressor = RandomForestRegressor(n_estimators=350)
     rf_regressor.fit(x_train, y_train)
     y_pred = rf_regressor.predict(x_test)
-    st.write(f"y_pred based off slider values: {y_pred[-1]}")
-
+    st.write(f"Predicted reduction efficiency based off slider values: {y_pred[-1]}%")
 
 def random_forest(x_train, x_test, y_train, y_test):
     rf_regressor = RandomForestRegressor(n_estimators=350)
@@ -152,8 +152,7 @@ def svr_predict(x_train, x_test2, y_train):
     svr = SVR(kernel='rbf')
     svr.fit(x_train, y_train)
     y_pred = svr.predict(x_test)
-    st.write(f"y_pred based off slider values: {y_pred[-1]}")
-
+    st.write(f"Predicted reduction efficiency based off slider values: {y_pred[-1]}%")
 
 def svr_model(x_train, x_test, y_train, y_test):
     svr = SVR(kernel='rbf')
@@ -189,8 +188,7 @@ def ridge_predict(x_train, x_test, y_train, y_test):
     ridge = Ridge(alpha=1.0)
     ridge.fit(x_train, y_train)
     y_pred = ridge.predict(x_test)
-    st.write(f"y_pred based off slider values: {y_pred[-1]}")
-
+    st.write(f"Predicted reduction efficiency based off slider values: {y_pred[-1]}%")
 
 def ridge_model(x_train, x_test, y_train, y_test):
     ridge = Ridge(alpha=1.0)
@@ -328,7 +326,7 @@ def xgboost_predict(x_train, x_test, y_train):
     xgb_model = xgb.XGBRegressor()
     xgb_model.fit(x_train, y_train)
     y_pred = xgb_model.predict(x_test)
-    st.write(f"y_pred based off slider values: {y_pred[-1]}")
+    st.write(f"Predicted reduction efficiency based off slider values: {y_pred[-1]}%")
 
 
 def xgboost(x_train, x_test, y_train, y_test):
