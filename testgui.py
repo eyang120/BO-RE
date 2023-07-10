@@ -54,7 +54,7 @@ if st.sidebar.checkbox("Display LASSO-selected features", False):
 st.sidebar.subheader("Choose model:")
 model_select = st.sidebar.selectbox("Model", ("Linear", "Random Forest", "SVR", "Ridge", "Neural Net", "XGBoost"))
 
-st.sidebar.subheader("Tune model:")
+st.sidebar.subheader("Predict reduction efficiency for:")
 
 last_row = df.iloc[-1].to_dict()
 with st.sidebar:
@@ -94,13 +94,6 @@ def linear_model(x_train, x_test, y_train, y_test):
 
     test_r2 = r2_score(y_test, y_pred)
 
-    fig = plt.figure()
-    plt.scatter(y_pred, y_test, color='blue', label="Actual")
-    plt.title("Linear Regression - Actual vs Predicted")
-    plt.xlabel("Predicted values")
-    plt.ylabel("Actual values")
-    plt.legend()
-    st.pyplot(fig)
 
     st.write("Cross-Validation RMSE Scores:")
     st.write(np.sqrt(cv_rmse_scores)[np.newaxis])
@@ -110,6 +103,14 @@ def linear_model(x_train, x_test, y_train, y_test):
     st.write("Average R^2: ", np.mean(cv_r2_scores))
     st.write("\nTest RMSE: ", test_rmse)
     st.write("Test R^2: ", test_r2)
+
+    fig = plt.figure()
+    plt.scatter(y_pred, y_test, color='blue', label="Actual")
+    plt.title("Linear Regression - Actual vs Predicted")
+    plt.xlabel("Predicted values")
+    plt.ylabel("Actual values")
+    plt.legend()
+    st.pyplot(fig)
 
 
 def rf_predict(x_train, x_test, y_train):
@@ -130,14 +131,6 @@ def random_forest(x_train, x_test, y_train, y_test):
 
     test_r2 = r2_score(y_test, y_pred)
 
-    fig = plt.figure()
-    plt.scatter(y_pred, y_test, color='blue', label="Actual")
-    plt.title("Random Forest Regression - Actual vs Predicted")
-    plt.xlabel("Predicted values")
-    plt.ylabel("Actual values")
-    plt.legend()
-    st.pyplot(fig)
-
     st.write("Cross-Validation RMSE Scores:")
     st.write(np.sqrt(cv_mse_scores)[np.newaxis])
     st.write("Average RMSE: ", np.mean(np.sqrt(cv_mse_scores)))
@@ -146,6 +139,14 @@ def random_forest(x_train, x_test, y_train, y_test):
     st.write("Average R^2: ", np.mean(cv_r2_scores))
     st.write("\nTest RMSE: ", test_rmse)
     st.write("Test R^2: ", test_r2)
+
+    fig = plt.figure()
+    plt.scatter(y_pred, y_test, color='blue', label="Actual")
+    plt.title("Random Forest Regression - Actual vs Predicted")
+    plt.xlabel("Predicted values")
+    plt.ylabel("Actual values")
+    plt.legend()
+    st.pyplot(fig)
 
 
 def svr_predict(x_train, x_test2, y_train):
@@ -166,14 +167,6 @@ def svr_model(x_train, x_test, y_train, y_test):
 
     test_r2 = r2_score(y_test, y_pred)
 
-    fig = plt.figure()
-    plt.scatter(y_pred, y_test, color='blue', label="Actual")
-    plt.title("SVM Regression - Actual vs Predicted")
-    plt.xlabel("Predicted values")
-    plt.ylabel("Actual values")
-    plt.legend()
-    st.pyplot(fig)
-
     st.write("Cross-Validation RMSE Scores:")
     st.write(np.sqrt(cv_mse_scores)[np.newaxis])
     st.write("Average RMSE: ", np.mean(np.sqrt(cv_mse_scores)))
@@ -182,6 +175,14 @@ def svr_model(x_train, x_test, y_train, y_test):
     st.write("Average R^2: ", np.mean(cv_r2_scores))
     st.write("\nTest RMSE: ", test_rmse)
     st.write("Test R^2: ", test_r2)
+
+    fig = plt.figure()
+    plt.scatter(y_pred, y_test, color='blue', label="Actual")
+    plt.title("SVM Regression - Actual vs Predicted")
+    plt.xlabel("Predicted values")
+    plt.ylabel("Actual values")
+    plt.legend()
+    st.pyplot(fig)
 
 
 def ridge_predict(x_train, x_test, y_train):
@@ -203,14 +204,6 @@ def ridge_model(x_train, x_test, y_train, y_test):
 
     test_r2 = r2_score(y_test, y_pred)
 
-    fig = plt.figure()
-    plt.scatter(y_pred, y_test, color='blue', label="Actual")
-    plt.title("Ridge Regression - Actual vs Predicted")
-    plt.xlabel("Predicted values")
-    plt.ylabel("Actual values")
-    plt.legend()
-    st.pyplot(fig)
-
     st.write("Cross-Validation RMSE Scores:")
     st.write(np.sqrt(cv_mse_scores)[np.newaxis])
     st.write("Average RMSE: ", np.mean(np.sqrt(cv_mse_scores)))
@@ -219,6 +212,14 @@ def ridge_model(x_train, x_test, y_train, y_test):
     st.write("Average R^2: ", np.mean(cv_r2_scores))
     st.write("\nTest RMSE: ", test_rmse)
     st.write("Test R^2: ", test_r2)
+
+    fig = plt.figure()
+    plt.scatter(y_pred, y_test, color='blue', label="Actual")
+    plt.title("Ridge Regression - Actual vs Predicted")
+    plt.xlabel("Predicted values")
+    plt.ylabel("Actual values")
+    plt.legend()
+    st.pyplot(fig)
 
 def neural_net(x_train, x_test, y_train, y_test):
     epoch_losses = []
@@ -290,12 +291,7 @@ def neural_net(x_train, x_test, y_train, y_test):
                 st.pyplot(fig1)
                 fig1.clf()
 
-    fig2 = plt.figure()
-    plt.plot(range(num_epochs), epoch_losses)
-    plt.xlabel('Epoch')
-    plt.ylabel('Loss')
-    plt.title('Epoch Loss')
-    st.pyplot(fig2)
+    
 
 
     model.eval()
@@ -319,8 +315,15 @@ def neural_net(x_train, x_test, y_train, y_test):
         y_pred = model(x_test_tensor).numpy()
 
     rmse = np.sqrt(mean_squared_error(y_test, y_pred))
-    st.write("Test RMSE:", rmse)    
-    st.write("Test R2:", r2_score(y_test, y_pred))
+    st.write("Test RMSE:", rmse)
+
+    fig2 = plt.figure()
+    plt.plot(range(num_epochs), epoch_losses)
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.title('Epoch Loss')
+    st.pyplot(fig2)
+
 
 def xgboost_predict(x_train, x_test, y_train):
     xgb_model = xgb.XGBRegressor()
@@ -344,13 +347,6 @@ def xgboost(x_train, x_test, y_train, y_test):
     r2 = r2_score(y_test, y_pred)
     st.write("R2 score:", r2)
 
-    fig = plt.figure()
-    plt.scatter(y_pred, y_test, color='blue', label="Actual")
-    plt.title("XGBoost Regression - Actual vs Predicted")
-    plt.xlabel("Predicted values")
-    plt.ylabel("Actual values")
-    plt.legend()
-    st.pyplot(fig)
 
     st.write("Cross-Validation MSE Scores:")
     st.write(cv_mse_scores[np.newaxis])
@@ -358,6 +354,15 @@ def xgboost(x_train, x_test, y_train, y_test):
     st.write("\nCross-Validation R^2 Scores:")
     st.write(cv_r2_scores[np.newaxis])
     st.write("Average R^2: ", np.mean(cv_r2_scores))
+
+    
+    fig = plt.figure()
+    plt.scatter(y_pred, y_test, color='blue', label="Actual")
+    plt.title("XGBoost Regression - Actual vs Predicted")
+    plt.xlabel("Predicted values")
+    plt.ylabel("Actual values")
+    plt.legend()
+    st.pyplot(fig)
 
 
 slider_values = {}
