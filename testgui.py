@@ -88,16 +88,18 @@ model_select = st.sidebar.selectbox("Model", ("Linear", "Random Forest", "SVR", 
 
 st.sidebar.subheader("Tune model:")
 
+last_row = df.iloc[-1].to_dict()
 with st.sidebar:
     for i in range(len(x_train.columns)):
         column = x_train.columns[i]
         feature_min = float(np.min(x_train[column]) - 5.0)
         feature_max = float(np.max(x_train[column]) + 5.0)
         value = st.slider(f"{str(column)}",
-                          value = exec("st.session_state.col" + str(i)) if f"col{i}" in st.session_state else feature_min,
+                          value = exec("st.session_state.col" + str(i)) if f"col{i}" in st.session_state else last_row[column],
                           min_value=feature_min, 
                           max_value=feature_max, 
-                          key=f"col{i}")
+                          key=f"col{i}"
+                          )
 
 
 @st.cache_data(persist=True)
@@ -238,3 +240,5 @@ if st.button("Run Model"):
         case "XGBoost":
             pass
     predict_button = st.button("Predict")
+    if predict_button: 
+        pass
