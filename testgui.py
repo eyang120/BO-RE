@@ -77,7 +77,7 @@ def linear_predict(x_train, x_test, y_train):
     lr = LinearRegression()
     lr.fit(x_train, y_train)
     y_pred = lr.predict(x_test)
-    return y_pred[-1]
+    st.write(f"y_pred based off slider values: {y_pred[-1]}")
 
 def linear_model(x_train, x_test, y_train, y_test):
     
@@ -110,6 +110,14 @@ def linear_model(x_train, x_test, y_train, y_test):
     st.write("\nTest RMSE: ", test_rmse)
     st.write("Test R^2: ", test_r2)
 
+
+def rf_predict(x_train, x_test, y_train):
+    rf_regressor = RandomForestRegressor(n_estimators=350)
+    rf_regressor.fit(x_train, y_train)
+    y_pred = rf_regressor.predict(x_test)
+    st.write(f"y_pred based off slider values: {y_pred[-1]}")
+
+
 def random_forest(x_train, x_test, y_train, y_test):
     rf_regressor = RandomForestRegressor(n_estimators=350)
 
@@ -139,6 +147,14 @@ def random_forest(x_train, x_test, y_train, y_test):
     st.write("\nTest RMSE: ", test_rmse)
     st.write("Test R^2: ", test_r2)
 
+
+def svr_predict(x_train, x_test2, y_train):
+    svr = SVR(kernel='rbf')
+    svr.fit(x_train, y_train)
+    y_pred = svr.predict(x_test)
+    st.write(f"y_pred based off slider values: {y_pred[-1]}")
+
+
 def svr_model(x_train, x_test, y_train, y_test):
     svr = SVR(kernel='rbf')
 
@@ -167,6 +183,13 @@ def svr_model(x_train, x_test, y_train, y_test):
     st.write("Average R^2: ", np.mean(cv_r2_scores))
     st.write("\nTest RMSE: ", test_rmse)
     st.write("Test R^2: ", test_r2)
+
+
+def ridge_predict(x_train, x_test, y_train, y_test):
+    ridge = Ridge(alpha=1.0)
+    ridge.fit(x_train, y_train)
+    y_pred = ridge.predict(x_test)
+    st.write(f"y_pred based off slider values: {y_pred[-1]}")
 
 
 def ridge_model(x_train, x_test, y_train, y_test):
@@ -300,6 +323,14 @@ def neural_net(x_train, x_test, y_train, y_test):
     rmse = np.sqrt(mean_squared_error(y_test, y_pred))
     st.write("Test RMSE:", rmse)
 
+
+def xgboost_predict(x_train, x_test, y_train):
+    xgb_model = xgb.XGBRegressor()
+    xgb_model.fit(x_train, y_train)
+    y_pred = xgb_model.predict(x_test)
+    st.write(f"y_pred based off slider values: {y_pred[-1]}")
+
+
 def xgboost(x_train, x_test, y_train, y_test):
     xgb_model = xgb.XGBRegressor()
 
@@ -361,5 +392,14 @@ if predict_button:
     x_test2 = pd.concat([x_test, new_row], ignore_index=True)
     match model_select:
         case "Linear":
-            y_pred = linear_predict(x_train, x_test2, y_train)
-            st.write(f"y_pred based off slider values: {y_pred}")
+            linear_predict(x_train, x_test2, y_train)
+        case "Random Forest":
+            rf_predict(x_train, x_test2, y_train)
+        case "SVR":
+            svr_predict(x_train, x_test2, y_train)
+        case "Ridge":
+            ridge_predict(x_train, x_test2, y_train)
+        case "Neural Net":
+            pass
+        case "XGBoost":
+            xgboost_predict(x_train, x_test2, y_train)
