@@ -54,7 +54,7 @@ if st.sidebar.checkbox("Display LASSO-selected features", False):
 st.sidebar.subheader("Choose model:")
 model_select = st.sidebar.selectbox("Model", ("Linear", "Random Forest", "SVR", "Ridge", "Neural Net", "XGBoost"))
 
-st.sidebar.subheader("Tune model:")
+st.sidebar.subheader("Predict reduction efficiency for:")
 
 last_row = df.iloc[-1].to_dict()
 with st.sidebar:
