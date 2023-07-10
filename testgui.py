@@ -384,17 +384,20 @@ if run_button:
 predict_button = st.button("Predict")
 if predict_button: 
     retrieve_slider_values()
+    new_row = pd.DataFrame(slider_values, index=[0])
+    x_test2 = pd.concat([x_test, new_row], ignore_index=True)
+    
     match model_select:
         case "Linear":
-            linear_model(x_train, x_test, y_train, y_test)
+            linear_model(x_train, x_test2, y_train, y_test)
         case "Random Forest":
-            random_forest(x_train, x_test, y_train, y_test)
+            random_forest(x_train, x_test2, y_train, y_test)
         case "SVR":
-            svr_model(x_train, x_test, y_train, y_test)
+            svr_model(x_train, x_test2, y_train, y_test)
         case "Ridge":
-            ridge_model(x_train, x_test, y_train, y_test)
+            ridge_model(x_train, x_test2, y_train, y_test)
         case "Neural Net":
-            neural_net(x_train, x_test, y_train, y_test)
+            neural_net(x_train, x_test2, y_train, y_test)
         case "XGBoost":
-            xgboost(x_train, x_test, y_train, y_test)
+            xgboost(x_train, x_test2, y_train, y_test)
     
