@@ -365,8 +365,8 @@ def retrieve_slider_values():
         column = x_train.columns[i] 
         slider_values[column] = st.session_state[f"col{i}"]
 
-
-if st.button("Run Model"):
+run_button = st.button("Run Model")
+if run_button:
     match model_select:
         case "Linear":
             linear_model(x_train, x_test, y_train, y_test)
@@ -380,7 +380,21 @@ if st.button("Run Model"):
             neural_net(x_train, x_test, y_train, y_test)
         case "XGBoost":
             xgboost(x_train, x_test, y_train, y_test)
-    predict_button = st.button("Predict")
+
+predict_button = st.button("Predict")
 if predict_button: 
     retrieve_slider_values()
+    match model_select:
+        case "Linear":
+            linear_model(x_train, x_test, y_train, y_test)
+        case "Random Forest":
+            random_forest(x_train, x_test, y_train, y_test)
+        case "SVR":
+            svr_model(x_train, x_test, y_train, y_test)
+        case "Ridge":
+            ridge_model(x_train, x_test, y_train, y_test)
+        case "Neural Net":
+            neural_net(x_train, x_test, y_train, y_test)
+        case "XGBoost":
+            xgboost(x_train, x_test, y_train, y_test)
     
