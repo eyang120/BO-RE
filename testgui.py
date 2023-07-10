@@ -88,7 +88,7 @@ if st.sidebar.checkbox("Display LASSO-selected features", False):
     st.write(selected_df)
 
 st.sidebar.subheader("Choose model:")
-model_select = st.sidebar.selectbox("Model", ("Linear", "Random Forest", "SVR", "Ridge", "Neutral Net", "XGBoost"))
+model_select = st.sidebar.selectbox("Model", ("Linear", "Random Forest", "SVR", "Ridge", "Neural Net", "XGBoost"))
 
 st.sidebar.subheader("Tune model:")
 
@@ -289,20 +289,21 @@ def neural_net(x_train, x_test, y_train, y_test):
                 y_pred = model(x_val)
                 predicted_values.append(y_pred)
 
-                fig = plt.scatter(y_val, y_pred)
+                fig1 = plt.figure()
+                plt.scatter(y_val, y_pred)
                 plt.xlabel('Actual y')
                 plt.ylabel('Predicted y')
                 plt.title('Predicted vs Actual (Epoch %d)' % (epoch+1))
-                st.pyplot(fig)
-                fig.clf()
+                st.pyplot(fig1)
+                fig1.clf()
 
-    fig = plt.figure()
+    fig2 = plt.figure()
     plt.plot(range(num_epochs), epoch_losses)
     plt.xlabel('Epoch')
     plt.ylabel('Loss')
     plt.title('Epoch Loss')
-    st.pyplot(fig)
-    fig.clf()
+    st.pyplot(fig2)
+
 
     model.eval()
     with torch.no_grad():
