@@ -185,7 +185,7 @@ def svr_model(x_train, x_test, y_train, y_test):
     st.pyplot(fig)
 
 
-def ridge_predict(x_train, x_test, y_train, y_test):
+def ridge_predict(x_train, x_test, y_train):
     ridge = Ridge(alpha=1.0)
     ridge.fit(x_train, y_train)
     y_pred = ridge.predict(x_test)
