@@ -370,6 +370,7 @@ def retrieve_slider_values():
         # st.write(slider_values[column])
 
 run_button = st.button("Run Model")
+predict_button = st.button("Predict")
 if run_button:
     match model_select:
         case "Linear":
@@ -385,7 +386,7 @@ if run_button:
         case "XGBoost":
             xgboost(x_train, x_test, y_train, y_test)
 
-predict_button = st.button("Predict")
+
 if predict_button: 
     retrieve_slider_values()
     new_row = pd.DataFrame(slider_values, index=[0])
