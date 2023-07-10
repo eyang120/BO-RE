@@ -364,7 +364,7 @@ def retrieve_slider_values():
     for i in range(len(x_train.columns)): 
         column = x_train.columns[i] 
         slider_values[column] = st.session_state[f"col{i}"]
-        st.write(slider_values[column])
+        # st.write(slider_values[column])
 
 run_button = st.button("Run Model")
 if run_button:
