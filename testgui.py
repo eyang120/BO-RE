@@ -434,6 +434,11 @@ def retrieve_slider_values():
 
 run_check = st.checkbox("Run Model")
 predict_check = st.checkbox("Predict")
+retrieve_slider_values()
+new_row = pd.DataFrame(slider_values, index=["Current Slider Values"])
+st.write(new_row)
+
+
 if run_check:
     match model_select:
         case "Linear":
@@ -451,8 +456,7 @@ if run_check:
 
 
 if predict_check: 
-    retrieve_slider_values()
-    new_row = pd.DataFrame(slider_values, index=[0])
+    
     x_test2 = pd.concat([x_test, new_row], ignore_index=True)
     match model_select:
         case "Linear":
