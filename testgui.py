@@ -79,7 +79,7 @@ def linear_predict(x_train, x_test, y_train):
     y_pred = lr.predict(x_test)
     st.write(f"Predicted reduction efficiency based off slider values: {y_pred[-1]}%")
 
-    
+
 def linear_model(x_train, x_test, y_train, y_test):
     
     lr = LinearRegression()
