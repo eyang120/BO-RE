@@ -77,7 +77,7 @@ def linear_predict(x_train, x_test, y_train):
     lr = LinearRegression()
     lr.fit(x_train, y_train)
     y_pred = lr.predict(x_test)
-    st.write(f"Predicted reduction efficiency based off slider values: {y_pred[-1]}%")
+    st.write(f"**Predicted reduction efficiency based off slider values: {y_pred[-1]}%**")
 
 
 def linear_model(x_train, x_test, y_train, y_test):
@@ -153,8 +153,7 @@ def svr_predict(x_train, x_test2, y_train):
     svr = SVR(kernel='rbf')
     svr.fit(x_train, y_train)
     y_pred = svr.predict(x_test)
-    st.write(f"Predicted reduction efficiency based off slider values: {y_pred[-1]}%")
-
+    st.write(f"**Predicted reduction efficiency based off slider values: {y_pred[-1]}%**")
 def svr_model(x_train, x_test, y_train, y_test):
     svr = SVR(kernel='rbf')
 
@@ -189,7 +188,8 @@ def ridge_predict(x_train, x_test, y_train):
     ridge = Ridge(alpha=1.0)
     ridge.fit(x_train, y_train)
     y_pred = ridge.predict(x_test)
-    st.write(f"Predicted reduction efficiency based off slider values: {y_pred[-1]}%")
+    st.write(f"**Predicted reduction efficiency based off slider values: {y_pred[-1]}%**")
+
 
 def ridge_model(x_train, x_test, y_train, y_test):
     ridge = Ridge(alpha=1.0)
@@ -220,6 +220,67 @@ def ridge_model(x_train, x_test, y_train, y_test):
     plt.ylabel("Actual values")
     plt.legend()
     st.pyplot(fig)
+
+
+def neural_predict(x_train, x_test, y_train):
+    epoch_losses = []
+    predicted_values = []
+
+    x_train_array = x_train.values
+    y_train_array = y_train.values
+    x_test_array = x_test.values
+
+    x_train_tensor = torch.from_numpy(x_train_array).float()
+    y_train_tensor = torch.from_numpy(y_train_array).float()
+    x_test_tensor = torch.from_numpy(x_test_array).float()
+
+    x_train, x_val, y_train, y_val = train_test_split(x_train_tensor, y_train_tensor, test_size=0.2, random_state=43)
+
+    class NeuralNet(nn.Module):
+        def __init__(self, input_size):
+            super(NeuralNet, self).__init__()
+            self.fc1 = nn.Linear(input_size, 64)
+            self.fc2 = nn.Linear(64, 64)
+            self.fc3 = nn.Linear(64, 1)
+            
+        def forward(self, x):
+            x = torch.relu(self.fc1(x))
+            x = torch.relu(self.fc2(x))
+            x = self.fc3(x)
+            return x
+
+    model = NeuralNet(input_size=x_train_tensor.shape[1])
+
+    criterion = nn.MSELoss()
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
+
+
+    num_epochs = 100
+    batch_size = 32
+
+
+    for epoch in range(num_epochs):
+        running_loss = 0.0
+        for i in range(0, len(x_train), batch_size):
+            inputs = x_train[i:i+batch_size]
+            labels = y_train[i:i+batch_size]
+
+            optimizer.zero_grad()
+
+            outputs = model(inputs)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
+
+            running_loss += loss.item()
+
+        epoch_losses.append(running_loss)
+
+    model.eval()
+    with torch.no_grad():
+        y_pred = model(x_test_tensor).numpy()
+    st.write(f"**Predicted reduction efficiency based off slider values: {y_pred[-1]}%**")
+  
 
 def neural_net(x_train, x_test, y_train, y_test):
     epoch_losses = []
@@ -329,8 +390,7 @@ def xgboost_predict(x_train, x_test, y_train):
     xgb_model = xgb.XGBRegressor()
     xgb_model.fit(x_train, y_train)
     y_pred = xgb_model.predict(x_test)
-    st.write(f"Predicted reduction efficiency based off slider values: {y_pred[-1]}%")
-
+    st.write(f"**Predicted reduction efficiency based off slider values: {y_pred[-1][0]}%**")
 
 def xgboost(x_train, x_test, y_train, y_test):
     xgb_model = xgb.XGBRegressor()
@@ -404,6 +464,6 @@ if predict_check:
         case "Ridge":
             ridge_predict(x_train, x_test2, y_train)
         case "Neural Net":
-            pass
+            neural_predict(x_train, x_test2, y_train)
         case "XGBoost":
             xgboost_predict(x_train, x_test2, y_train)
