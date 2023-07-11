@@ -9,6 +9,7 @@ from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split, cross_validate, cross_val_score
 import matplotlib.pyplot as plt
 import plotly.express as px
+import mpld3
 import streamlit.components.v1 as components
 import torch
 import torch.nn as nn
@@ -21,6 +22,11 @@ st.sidebar.title('Options')
 
 @st.cache_data(persist= True)
 def load():
+    """_summary_
+
+    Returns:
+        _type_: _description_
+    """
     data = pd.read_csv("BORE_v3.csv")
     data = modeling.correct_dtypes(data)
     data = modeling.gen_cleaning(data)
@@ -57,19 +63,27 @@ st.sidebar.subheader("Choose model:")
 model_select = st.sidebar.selectbox("Model", ("Linear", "Random Forest", "SVR", "Ridge", "Neural Net", "XGBoost"))
 
 st.sidebar.subheader("Predict reduction efficiency for:")
+st.sidebar.write("Features are listed in order of importance (measured by LASSO).")
 
 last_row = df.iloc[-1].to_dict()
+
 with st.sidebar:
     for i in range(len(x_train.columns)):
         column = x_train.columns[i]
         feature_min = float(np.min(x_train[column]) - 5.0)
         feature_max = float(np.max(x_train[column]) + 5.0)
-        value = st.slider(f"{str(column)}",
-                          value = exec("st.session_state.col" + str(i)) if f"col{i}" in st.session_state else last_row[column],
+        # print(st.session_state)
+        col_value = st.slider(f"{str(column)}",
+                          value = st.session_state[f"text{i}"] if f"text{i}" in st.session_state else last_row[column],
                           min_value=feature_min, 
                           max_value=feature_max, 
                           key=f"col{i}"
                           )
+        textbox = st.number_input(f"{str(column)}", value=float(st.session_state[f"col{i}"]) if f"col{i}" in st.session_state else float(col_value),
+                                min_value=feature_min,
+                                max_value=feature_max,
+                                step=10.0,
+                                key=f"text{i}")
 
 
 @st.cache_data(persist=True)
@@ -253,10 +267,13 @@ def neural_predict(x_train, x_test, y_train):
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
+
     num_epochs = 100
     batch_size = 32
 
+
     for epoch in range(num_epochs):
+        running_loss = 0.0
         for i in range(0, len(x_train), batch_size):
             inputs = x_train[i:i+batch_size]
             labels = y_train[i:i+batch_size]
