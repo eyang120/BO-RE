@@ -456,7 +456,7 @@ def neural_net(x_train, x_test, y_train, y_test):
 
         epoch_losses.append(running_loss)
 
-        st.write('Epoch [%d/%d], Loss: %.4f' % (epoch+1, num_epochs, running_loss))
+        # st.write('Epoch [%d/%d], Loss: %.4f' % (epoch+1, num_epochs, running_loss))
 
         if (epoch+1) % 20 == 0:
             model.eval()
@@ -471,13 +471,42 @@ def neural_net(x_train, x_test, y_train, y_test):
                 # plt.title('Predicted vs Actual (Epoch %d)' % (epoch+1))
                 # st.pyplot(fig1)
                 # fig1.clf()
-                print(y_val)
-                print(y_pred)
-                fig1 = px.scatter(x=y_pred.numpy().flatten(), y=y_val.numpy().flatten())
-                fig1.update_layout(title=f"Predicted vs Actual (Epoch {epoch + 1})",
-                                   xaxis_title="Predicted y",
-                                   yaxis_title="Actual y")
-                st.plotly_chart(fig1, theme=None)
+
+                # fig1 = px.scatter(x=y_pred.numpy().flatten(), y=y_val.numpy().flatten())
+                # fig1.update_layout(title=f"Predicted vs Actual (Epoch {epoch + 1})",
+                #                    xaxis_title="Predicted y",
+                #                    yaxis_title="Actual y")
+                # st.plotly_chart(fig1, theme=None)
+                
+                fig_min = float(min(y_pred.numpy().min(), y_val.numpy().min()) - 5)
+                fig_max = float(max(y_pred.numpy().max(), y_val.numpy().max()) + 5)
+                fig = make_subplots()
+                fig.update_layout(title= f"Predicted vs Actual (Epoch {epoch + 1})",
+                                    xaxis_title="Predicted y", 
+                                    yaxis_title="Actual y")
+                fig.add_trace(go.Scatter(x=y_pred.numpy().flatten(), 
+                                        y=y_val.numpy().flatten(),
+                                        showlegend=False, 
+                                        mode="markers"))
+                fig.add_shape(type="line", 
+                            x0=fig_min - 10, 
+                            y0=fig_min - 10, 
+                            x1=fig_max + 10, 
+                            y1=fig_max + 10,
+                            line=dict(color="#d62728",width=3))
+                fig.add_trace(go.Scatter(
+                    x=list(range(round(fig_min) - 1, round(fig_max) + 1)), 
+                    y=list(range(round(fig_min) - 1, round(fig_max) + 1)),  
+                    mode="lines", 
+                    name="",
+                    showlegend=False, 
+                    text="The closer the dots are to this line, the better the predictions are.",
+                    opacity=0))
+                
+                fig.update_xaxes(range=[fig_min, fig_max])
+                fig.update_yaxes(range=[fig_min, fig_max])
+                
+                st.plotly_chart(fig, theme=None)
                 
                 
 
