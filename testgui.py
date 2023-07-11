@@ -63,6 +63,14 @@ if st.sidebar.checkbox("Display LASSO-selected features", False):
 
 if st.sidebar.checkbox("Display EDA for Reduction Efficiency", False):
     st.subheader("EDA for Reduction Efficiency")
+    fig1 = px.line(x=x.index, y=y)
+    fig1.update_layout(title="Reduction Efficiency vs Time",
+                      xaxis_title="Date",
+                      yaxis_title="Reduction Efficiency (%)")
+    st.plotly_chart(fig1, theme=None)
+    
+    fig2 = px.histogram(y)
+    st.plotly_chart(fig2, theme=None)
     
 
 
