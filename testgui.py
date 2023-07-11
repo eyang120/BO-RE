@@ -9,8 +9,6 @@ from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split, cross_validate, cross_val_score
 import matplotlib.pyplot as plt
 import plotly.express as px
-import mpld3
-import streamlit.components.v1 as components
 import torch
 import torch.nn as nn
 import torch.optim as optim
