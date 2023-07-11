@@ -11,7 +11,6 @@ However, to host the file, Python is required, as well as the following librarie
 - numpy
 - streamlit
 - sklearn
-- matplotlib
 - plotly
 - pytorch
 - xgboost
