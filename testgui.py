@@ -16,11 +16,13 @@ import torch.nn as nn
 import torch.optim as optim
 import xgboost as xgb
 import modeling 
+import plotly.graph_objs as go
+from plotly.subplots import make_subplots
 
 st.title('Bogalusa Reduction Efficiency Modelling')
 st.sidebar.title('Options')
 
-@st.cache_data(persist= True)
+@st.cache_data()
 def load():
     """_summary_
 
@@ -40,7 +42,7 @@ if st.sidebar.checkbox("Display data", False):
     st.subheader("Bogalusa Reduction Efficiency Dataset")
     st.write(df)
 
-@st.cache_data(persist=True)
+@st.cache_data()
 def feature_selection(data, x, y):
     lasso = Lasso(alpha = 0.3)
     lasso.fit(x, y)
@@ -65,6 +67,7 @@ model_select = st.sidebar.selectbox("Model", ("Linear", "Random Forest", "SVR", 
 st.sidebar.subheader("Predict reduction efficiency for:")
 st.sidebar.write("Features are listed in order of importance (measured by LASSO).")
 st.sidebar.write("The topmost features are the most important.")
+st.sidebar.write("You can either drag the sliders or type in your desired value.")
 
 last_row = df.iloc[-1].to_dict()
 
@@ -85,9 +88,6 @@ with st.sidebar:
                                 max_value=feature_max,
                                 step=5.0,
                                 key=f"text{i}")
-
-
-@st.cache_data(persist=True)
 
 
 def linear_predict(x_train, x_test, y_train):
@@ -121,13 +121,44 @@ def linear_model(x_train, x_test, y_train, y_test):
     st.write("\nTest RMSE: ", test_rmse)
     st.write("Test R^2: ", test_r2)
 
-    fig = plt.figure()
-    plt.scatter(y_pred, y_test, color='blue', label="Actual")
-    plt.title("Linear Regression - Actual vs Predicted")
-    plt.xlabel("Predicted values")
-    plt.ylabel("Actual values")
-    plt.legend()
-    st.pyplot(fig)
+    # fig = plt.figure()
+    # plt.scatter(y_pred, y_test, color='blue', label="Actual")
+    # plt.title("Linear Regression - Actual vs Predicted")
+    # plt.xlabel("Predicted values")
+    # plt.ylabel("Actual values")
+    # plt.legend()
+    # st.pyplot(fig)
+    
+    fig_min = float(min(y_pred.min(), y_test.min()) - 5)
+    fig_max = float(max(y_pred.max(), y_test.max()) + 5)
+    fig = make_subplots()
+    fig.update_layout(title= "Linear Regression - Actual vs Predicted",
+                        xaxis_title="Predicted values", 
+                        yaxis_title="Actual values")
+    fig.add_trace(go.Scatter(x=y_pred, 
+                             y=y_test,
+                             showlegend=False, 
+                             mode="markers"))
+    fig.add_shape(type="line", 
+                  x0=fig_min - 10, 
+                  y0=fig_min - 10, 
+                  x1=fig_max + 10, 
+                  y1=fig_max + 10,
+                  line=dict(color="#d62728",width=3))
+    fig.add_trace(go.Scatter(
+        x=list(range(round(fig_min) - 1, round(fig_max) + 1)), 
+        y=list(range(round(fig_min) - 1, round(fig_max) + 1)),  
+        mode="lines", 
+        name="",
+        showlegend=False, 
+        text="The closer the dots are to this line, the better the predictions are.",
+        opacity=0))
+    
+    fig.update_xaxes(range=[fig_min, fig_max])
+    fig.update_yaxes(range=[fig_min, fig_max])
+    
+    st.plotly_chart(fig, theme=None)
+    
 
 
 def rf_predict(x_train, x_test, y_train):
@@ -157,13 +188,35 @@ def random_forest(x_train, x_test, y_train, y_test):
     st.write("\nTest RMSE: ", test_rmse)
     st.write("Test R^2: ", test_r2)
 
-    fig = plt.figure()
-    plt.scatter(y_pred, y_test, color='blue', label="Actual")
-    plt.title("Random Forest Regression - Actual vs Predicted")
-    plt.xlabel("Predicted values")
-    plt.ylabel("Actual values")
-    plt.legend()
-    st.pyplot(fig)
+    fig_min = float(min(y_pred.min(), y_test.min()) - 5)
+    fig_max = float(max(y_pred.max(), y_test.max()) + 5)
+    fig = make_subplots()
+    fig.update_layout(title= "Random Forest Regression - Actual vs Predicted",
+                        xaxis_title="Predicted values", 
+                        yaxis_title="Actual values")
+    fig.add_trace(go.Scatter(x=y_pred, 
+                             y=y_test,
+                             showlegend=False, 
+                             mode="markers"))
+    fig.add_shape(type="line", 
+                  x0=fig_min - 10, 
+                  y0=fig_min - 10, 
+                  x1=fig_max + 10, 
+                  y1=fig_max + 10,
+                  line=dict(color="#d62728",width=3))
+    fig.add_trace(go.Scatter(
+        x=list(range(round(fig_min) - 1, round(fig_max) + 1)), 
+        y=list(range(round(fig_min) - 1, round(fig_max) + 1)),  
+        mode="lines", 
+        name="",
+        showlegend=False, 
+        text="The closer the dots are to this line, the better the predictions are.",
+        opacity=0))
+    
+    fig.update_xaxes(range=[fig_min, fig_max])
+    fig.update_yaxes(range=[fig_min, fig_max])
+    
+    st.plotly_chart(fig, theme=None)
 
 
 def svr_predict(x_train, x_test, y_train):
@@ -194,13 +247,35 @@ def svr_model(x_train, x_test, y_train, y_test):
     st.write("\nTest RMSE: ", test_rmse)
     st.write("Test R^2: ", test_r2)
 
-    fig = plt.figure()
-    plt.scatter(y_pred, y_test, color='blue', label="Actual")
-    plt.title("SVM Regression - Actual vs Predicted")
-    plt.xlabel("Predicted values")
-    plt.ylabel("Actual values")
-    plt.legend()
-    st.pyplot(fig)
+    fig_min = float(min(y_pred.min(), y_test.min()) - 5)
+    fig_max = float(max(y_pred.max(), y_test.max()) + 5)
+    fig = make_subplots()
+    fig.update_layout(title= "SVM Regression - Actual vs Predicted",
+                        xaxis_title="Predicted values", 
+                        yaxis_title="Actual values")
+    fig.add_trace(go.Scatter(x=y_pred, 
+                             y=y_test,
+                             showlegend=False, 
+                             mode="markers"))
+    fig.add_shape(type="line", 
+                  x0=fig_min - 10, 
+                  y0=fig_min - 10, 
+                  x1=fig_max + 10, 
+                  y1=fig_max + 10,
+                  line=dict(color="#d62728",width=3))
+    fig.add_trace(go.Scatter(
+        x=list(range(round(fig_min) - 1, round(fig_max) + 1)), 
+        y=list(range(round(fig_min) - 1, round(fig_max) + 1)),  
+        mode="lines", 
+        name="",
+        showlegend=False, 
+        text="The closer the dots are to this line, the better the predictions are.",
+        opacity=0))
+    
+    fig.update_xaxes(range=[fig_min, fig_max])
+    fig.update_yaxes(range=[fig_min, fig_max])
+    
+    st.plotly_chart(fig, theme=None)
 
 
 def ridge_predict(x_train, x_test, y_train):
@@ -232,13 +307,35 @@ def ridge_model(x_train, x_test, y_train, y_test):
     st.write("\nTest RMSE: ", test_rmse)
     st.write("Test R^2: ", test_r2)
 
-    fig = plt.figure()
-    plt.scatter(y_pred, y_test, color='blue', label="Actual")
-    plt.title("Ridge Regression - Actual vs Predicted")
-    plt.xlabel("Predicted values")
-    plt.ylabel("Actual values")
-    plt.legend()
-    st.pyplot(fig)
+    fig_min = float(min(y_pred.min(), y_test.min()) - 5)
+    fig_max = float(max(y_pred.max(), y_test.max()) + 5)
+    fig = make_subplots()
+    fig.update_layout(title= "Ridge Regression - Actual vs Predicted",
+                        xaxis_title="Predicted values", 
+                        yaxis_title="Actual values")
+    fig.add_trace(go.Scatter(x=y_pred, 
+                             y=y_test,
+                             showlegend=False, 
+                             mode="markers"))
+    fig.add_shape(type="line", 
+                  x0=fig_min - 10, 
+                  y0=fig_min - 10, 
+                  x1=fig_max + 10, 
+                  y1=fig_max + 10,
+                  line=dict(color="#d62728",width=3))
+    fig.add_trace(go.Scatter(
+        x=list(range(round(fig_min) - 1, round(fig_max) + 1)), 
+        y=list(range(round(fig_min) - 1, round(fig_max) + 1)),  
+        mode="lines", 
+        name="",
+        showlegend=False, 
+        text="The closer the dots are to this line, the better the predictions are.",
+        opacity=0))
+    
+    fig.update_xaxes(range=[fig_min, fig_max])
+    fig.update_yaxes(range=[fig_min, fig_max])
+    
+    st.plotly_chart(fig, theme=None)
 
 
 def neural_predict(x_train, x_test, y_train):
@@ -391,12 +488,18 @@ def neural_net(x_train, x_test, y_train, y_test):
     rmse = np.sqrt(mean_squared_error(y_test, y_pred))
     st.write("Test RMSE:", rmse)
 
-    fig2 = plt.figure()
-    plt.plot(range(num_epochs), epoch_losses)
-    plt.xlabel('Epoch')
-    plt.ylabel('Loss')
-    plt.title('Epoch Loss')
-    st.pyplot(fig2)
+    # fig2 = plt.figure()
+    # plt.plot(range(num_epochs), epoch_losses)
+    # plt.xlabel('Epoch')
+    # plt.ylabel('Loss')
+    # plt.title('Epoch Loss')
+    # st.pyplot(fig2)
+    
+    fig2 = px.line(x=list(range(num_epochs)), y=epoch_losses)
+    fig2.update_layout(title= "Epoch Loss",
+                        xaxis_title="Epoch", 
+                        yaxis_title="Loss")
+    
 
 
 def xgboost_predict(x_train, x_test, y_train):
@@ -429,13 +532,35 @@ def xgboost(x_train, x_test, y_train, y_test):
     st.write("Average R^2: ", np.mean(cv_r2_scores))
 
     
-    fig = plt.figure()
-    plt.scatter(y_pred, y_test, color='blue', label="Actual")
-    plt.title("XGBoost Regression - Actual vs Predicted")
-    plt.xlabel("Predicted values")
-    plt.ylabel("Actual values")
-    plt.legend()
-    st.pyplot(fig)
+    fig_min = float(min(y_pred.min(), y_test.min()) - 5)
+    fig_max = float(max(y_pred.max(), y_test.max()) + 5)
+    fig = make_subplots()
+    fig.update_layout(title= "XGBoost Regression - Actual vs Predicted",
+                        xaxis_title="Predicted values", 
+                        yaxis_title="Actual values")
+    fig.add_trace(go.Scatter(x=y_pred, 
+                             y=y_test,
+                             showlegend=False, 
+                             mode="markers"))
+    fig.add_shape(type="line", 
+                  x0=fig_min - 10, 
+                  y0=fig_min - 10, 
+                  x1=fig_max + 10, 
+                  y1=fig_max + 10,
+                  line=dict(color="#d62728",width=3))
+    fig.add_trace(go.Scatter(
+        x=list(range(round(fig_min) - 1, round(fig_max) + 1)), 
+        y=list(range(round(fig_min) - 1, round(fig_max) + 1)),  
+        mode="lines", 
+        name="",
+        showlegend=False, 
+        text="The closer the dots are to this line, the better the predictions are.",
+        opacity=0))
+    
+    fig.update_xaxes(range=[fig_min, fig_max])
+    fig.update_yaxes(range=[fig_min, fig_max])
+    
+    st.plotly_chart(fig, theme=None)
 
 
 slider_values = {}
