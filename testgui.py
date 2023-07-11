@@ -166,7 +166,7 @@ def random_forest(x_train, x_test, y_train, y_test):
     st.pyplot(fig)
 
 
-def svr_predict(x_train, x_test2, y_train):
+def svr_predict(x_train, x_test, y_train):
     svr = SVR(kernel='rbf')
     svr.fit(x_train, y_train)
     y_pred = svr.predict(x_test)
