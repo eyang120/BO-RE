@@ -96,7 +96,7 @@ with st.sidebar:
                           max_value=feature_max, 
                           key=f"col{i}"
                           )
-        textbox = st.number_input(f"{str(column)}", value=float(st.session_state[f"col{i}"]) if f"col{i}" in st.session_state else float(col_value),
+        textbox = st.number_input(f"Desired Value", value=float(st.session_state[f"col{i}"]) if f"col{i}" in st.session_state else float(col_value),
                                 min_value=feature_min,
                                 max_value=feature_max,
                                 step=5.0,
