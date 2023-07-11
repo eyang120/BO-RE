@@ -64,6 +64,7 @@ model_select = st.sidebar.selectbox("Model", ("Linear", "Random Forest", "SVR", 
 
 st.sidebar.subheader("Predict reduction efficiency for:")
 st.sidebar.write("Features are listed in order of importance (measured by LASSO).")
+st.sidebar.write("The topmost features are the most important.")
 
 last_row = df.iloc[-1].to_dict()
 
