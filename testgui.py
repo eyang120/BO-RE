@@ -59,6 +59,11 @@ if st.sidebar.checkbox("Display LASSO-selected features", False):
     st.subheader("Selected BO-RE Features:")
     st.write(selected_df)
 
+if st.sidebar.checkbox("Display EDA for Reduction Efficiency", False):
+    st.subheader("EDA for Reduction Efficiency")
+    
+
+
 st.sidebar.subheader("Choose model:")
 model_select = st.sidebar.selectbox("Model", ("Linear", "Random Forest", "SVR", "Ridge", "Neural Net", "XGBoost"))
 
