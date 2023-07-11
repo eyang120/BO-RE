@@ -9,7 +9,6 @@ from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split, cross_validate, cross_val_score
 import matplotlib.pyplot as plt
 import plotly.express as px
-import mpld3
 import streamlit.components.v1 as components
 import torch
 import torch.nn as nn
@@ -39,7 +38,10 @@ if st.sidebar.checkbox("Display data", False):
 def feature_selection(data, x, y):
     lasso = Lasso(alpha = 0.3)
     lasso.fit(x, y)
-    selected_features = x.columns[abs(lasso.coef_) >= 0.1]
+    feature_importances = abs(lasso.coef_)
+    sorted_indices = np.argsort(feature_importances)[::-1]
+    sorted_features = x.columns[sorted_indices]
+    selected_features = sorted_features[feature_importances[sorted_indices] >= 0.1]
     selected_df = data[selected_features.to_list()]
     return selected_df
 
@@ -223,9 +225,6 @@ def ridge_model(x_train, x_test, y_train, y_test):
 
 
 def neural_predict(x_train, x_test, y_train):
-    epoch_losses = []
-    predicted_values = []
-
     x_train_array = x_train.values
     y_train_array = y_train.values
     x_test_array = x_test.values
@@ -254,13 +253,10 @@ def neural_predict(x_train, x_test, y_train):
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-
     num_epochs = 100
     batch_size = 32
 
-
     for epoch in range(num_epochs):
-        running_loss = 0.0
         for i in range(0, len(x_train), batch_size):
             inputs = x_train[i:i+batch_size]
             labels = y_train[i:i+batch_size]
@@ -272,15 +268,12 @@ def neural_predict(x_train, x_test, y_train):
             loss.backward()
             optimizer.step()
 
-            running_loss += loss.item()
-
-        epoch_losses.append(running_loss)
-
     model.eval()
     with torch.no_grad():
         y_pred = model(x_test_tensor).numpy()
-    st.write(f"**Predicted reduction efficiency based off slider values: {y_pred[-1]}%**")
-  
+
+    st.write(f"**Predicted reduction efficiency based off slider values: {y_pred[-1][0]}%**")
+
 
 def neural_net(x_train, x_test, y_train, y_test):
     epoch_losses = []
