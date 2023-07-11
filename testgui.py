@@ -94,7 +94,7 @@ def linear_predict(x_train, x_test, y_train):
     lr = LinearRegression()
     lr.fit(x_train, y_train)
     y_pred = lr.predict(x_test)
-    st.write(f"**Predicted reduction efficiency based on slider values: {100 if y_pred[-1] > 100 else y_pred[-1]}%**")
+    st.write(f"**Predicted reduction efficiency based on slider values: {round(100 if y_pred[-1] > 100 else y_pred[-1], 2)}%**")
 
 
 def linear_model(x_train, x_test, y_train, y_test):
@@ -165,7 +165,7 @@ def rf_predict(x_train, x_test, y_train):
     rf_regressor = RandomForestRegressor(n_estimators=350)
     rf_regressor.fit(x_train, y_train)
     y_pred = rf_regressor.predict(x_test)
-    st.write(f"**Predicted reduction efficiency based on slider values: {100 if y_pred[-1] > 100 else y_pred[-1]}%**")
+    st.write(f"**Predicted reduction efficiency based on slider values: {round(100 if y_pred[-1] > 100 else y_pred[-1], 2)}%**")
 
 def random_forest(x_train, x_test, y_train, y_test):
     rf_regressor = RandomForestRegressor(n_estimators=350)
@@ -223,7 +223,7 @@ def svr_predict(x_train, x_test, y_train):
     svr = SVR(kernel='rbf')
     svr.fit(x_train, y_train)
     y_pred = svr.predict(x_test)
-    st.write(f"**Predicted reduction efficiency based on slider values: {100 if y_pred[-1] > 100 else y_pred[-1]}%**")
+    st.write(f"**Predicted reduction efficiency based on slider values: {round(100 if y_pred[-1] > 100 else y_pred[-1], 2)}%**")
 
 
 def svr_model(x_train, x_test, y_train, y_test):
@@ -282,7 +282,7 @@ def ridge_predict(x_train, x_test, y_train):
     ridge = Ridge(alpha=1.0)
     ridge.fit(x_train, y_train)
     y_pred = ridge.predict(x_test)
-    st.write(f"**Predicted reduction efficiency based on slider values: {100 if y_pred[-1] > 100 else y_pred[-1]}%**")
+    st.write(f"**Predicted reduction efficiency based on slider values: {round(100 if y_pred[-1] > 100 else y_pred[-1], 2)}%**")
 
 
 def ridge_model(x_train, x_test, y_train, y_test):
@@ -389,7 +389,7 @@ def neural_predict(x_train, x_test, y_train):
     with torch.no_grad():
         y_pred = model(x_test_tensor).numpy()
 
-    st.write(f"**Predicted reduction efficiency based on slider values: {100 if y_pred[-1][0] > 100 else y_pred[-1][0]}%**")
+    st.write(f"**Predicted reduction efficiency based on slider values: {round(100 if y_pred[-1][0] > 100 else y_pred[-1][0], 2)}%**")
 
 
 def neural_net(x_train, x_test, y_train, y_test):
@@ -506,7 +506,7 @@ def xgboost_predict(x_train, x_test, y_train):
     xgb_model = xgb.XGBRegressor()
     xgb_model.fit(x_train, y_train)
     y_pred = xgb_model.predict(x_test)
-    st.write(f"**Predicted reduction efficiency based on slider values: {100 if y_pred[-1] > 100 else y_pred[-1]}%**")
+    st.write(f"**Predicted reduction efficiency based on slider values: {round(100 if y_pred[-1] > 100 else y_pred[-1], 2)}%**")
 
 def xgboost(x_train, x_test, y_train, y_test):
     xgb_model = xgb.XGBRegressor()
