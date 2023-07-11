@@ -7,7 +7,6 @@ from sklearn.svm import SVR
 from sklearn.linear_model import Lasso, LinearRegression, Ridge
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split, cross_validate, cross_val_score
-import matplotlib.pyplot as plt
 import plotly.express as px
 import torch
 import torch.nn as nn
@@ -465,13 +464,22 @@ def neural_net(x_train, x_test, y_train, y_test):
                 y_pred = model(x_val)
                 predicted_values.append(y_pred)
 
-                fig1 = plt.figure()
-                plt.scatter(y_val, y_pred)
-                plt.xlabel('Actual y')
-                plt.ylabel('Predicted y')
-                plt.title('Predicted vs Actual (Epoch %d)' % (epoch+1))
-                st.pyplot(fig1)
-                fig1.clf()
+                # fig1 = plt.figure()
+                # plt.scatter(y_val, y_pred)
+                # plt.xlabel('Actual y')
+                # plt.ylabel('Predicted y')
+                # plt.title('Predicted vs Actual (Epoch %d)' % (epoch+1))
+                # st.pyplot(fig1)
+                # fig1.clf()
+                print(y_val)
+                print(y_pred)
+                fig1 = px.scatter(x=y_pred.numpy().flatten(), y=y_val.numpy().flatten())
+                fig1.update_layout(title=f"Predicted vs Actual (Epoch {epoch + 1})",
+                                   xaxis_title="Predicted y",
+                                   yaxis_title="Actual y")
+                st.plotly_chart(fig1, theme=None)
+                
+                
 
     
 
@@ -510,6 +518,7 @@ def neural_net(x_train, x_test, y_train, y_test):
     fig2.update_layout(title= "Epoch Loss",
                         xaxis_title="Epoch", 
                         yaxis_title="Loss")
+    st.plotly_chart(fig2, theme=None)
     
 
 
