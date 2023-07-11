@@ -16,6 +16,11 @@ However, to host the file, Python is required, as well as the following librarie
 - pytorch
 - xgboost
 
+To install these, go to where the repository is located, open a terminal
+and type the following:
+```pip install -r requirements.txt
+```
+
 # Build and Test
 To begin hosting, go to the location of the repository, access the terminal, and run the following command.
 ```python -m streamlit run testgui.py```
