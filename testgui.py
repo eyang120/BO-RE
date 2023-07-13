@@ -12,7 +12,6 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import xgboost as xgb
-import modeling 
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 
@@ -21,8 +20,51 @@ st.sidebar.title('Options')
 
 uploaded_file = st.sidebar.file_uploader("Choose a xlsx or csv file.")
 y_name = st.sidebar.text_input(label="Name of y variable:")
+time_name = st.sidebar.text_input(label="Name of time variable:")
+inputs_added = (uploaded_file is not None) & (y_name is not None) & (time_name is not None)
 
-if uploaded_file is not None:
+
+
+
+if inputs_added:
+    def correct_dtypes(df: pd.DataFrame, time_name: str):
+        """
+        Correct the data types of the BO RE data. 
+        Transform Timestamp into datetime format and force all numerical data.
+        """
+        
+        if type(df) != pd.DataFrame:
+            raise TypeError("Data is not DataFrame!")
+        
+        numeric_types = (int, float)
+        
+        for col in df:
+            if col == time_name:
+                df[col] = pd.to_datetime(df[col])
+            elif df[col].dtype not in numeric_types:
+                df[col] = pd.to_numeric(df[col], errors="coerce")
+        return df
+
+
+
+    def gen_cleaning(df: pd.DataFrame, time_name):
+        """
+        General dataframe cleaning: 
+        - Drop rows were all values are NaN/NaT
+        - Drop columns with excessive NaN
+        - Interpolate missing values
+        - Remove outliers
+        - Set timestamp as index
+        """
+        df.dropna(inplace=True, how = 'all')
+        blank_cols = df.isnull().sum()[df.isnull().sum() > 10].index
+        #display(blank_cols)
+        df.drop(blank_cols, axis=1, inplace=True)
+        df = df.interpolate()
+        # df = df[df['RE test'] >= 60]
+        df.set_index(time_name, inplace=True)
+        return df
+    
     @st.cache_data()
     def load():
         """_summary_
@@ -36,12 +78,17 @@ if uploaded_file is not None:
             data = pd.read_excel(uploaded_file)
         else:
             raise TypeError("Invalid file type!")
-        data = modeling.correct_dtypes(data)
-        data = modeling.gen_cleaning(data)
+        
+        if y_name not in data.columns:
+            raise ValueError("Target variable not in columns!")
+        if time_name not in data.columns:
+            raise ValueError("Time column name not in columns!")
+        data = correct_dtypes(data, time_name)
+        data = gen_cleaning(data, time_name)
         return data
+    
+    
     df = load()
-    if y_name not in df.columns:
-        raise ValueError("Target variable not in columns!")
     x = df.drop(y_name, axis = 1)
     y = df[y_name]
 
