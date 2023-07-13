@@ -15,7 +15,7 @@ import xgboost as xgb
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 
-st.title('Bogalusa Reduction Efficiency Modelling')
+st.title('Bogalusa Reduction Efficiency Modeling')
 st.sidebar.title('Options')
 
 def correct_dtypes(df: pd.DataFrame, time_name: str):
@@ -147,6 +147,7 @@ last_row = df.iloc[-1].to_dict()
 
 with st.sidebar:
     for i in range(len(x_train.columns)):
+        
         column = x_train.columns[i]
         feature_min = float(np.min(x_train[column]) - 5.0)
         feature_max = float(np.max(x_train[column]) + 5.0)
