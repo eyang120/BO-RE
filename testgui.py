@@ -18,77 +18,97 @@ from plotly.subplots import make_subplots
 st.title('Bogalusa Reduction Efficiency Modelling')
 st.sidebar.title('Options')
 
+def correct_dtypes(df: pd.DataFrame, time_name: str):
+    """
+    Correct the data types of the BO RE data. 
+    Transform Timestamp into datetime format and force all numerical data.
+    """
+    
+    if type(df) != pd.DataFrame:
+        raise TypeError("Data is not DataFrame!")
+    
+    numeric_types = (int, float)
+    
+    for col in df:
+        if col == time_name:
+            df[col] = pd.to_datetime(df[col])
+        elif df[col].dtype not in numeric_types:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+    return df
+
+
+
+def gen_cleaning(df: pd.DataFrame, time_name):
+    """
+    General dataframe cleaning: 
+    - Drop rows were all values are NaN/NaT
+    - Drop columns with excessive NaN
+    - Interpolate missing values
+    - Remove outliers
+    - Set timestamp as index
+    """
+    df.dropna(inplace=True, how = 'all')
+    blank_cols = df.isnull().sum()[df.isnull().sum() > 10].index
+    #display(blank_cols)
+    df.drop(blank_cols, axis=1, inplace=True)
+    df = df.interpolate()
+    # df = df[df['RE test'] >= 60]
+    df.set_index(time_name, inplace=True)
+    return df
+
+@st.cache_data()
+def load(uploaded_file):
+    """_summary_
+
+    Returns:
+        _type_: _description_
+    """
+    if uploaded_file.name[-4:] == ".csv":
+        data = pd.read_csv(uploaded_file)
+    elif uploaded_file.name[-5:] == ".xlsx":
+        data = pd.read_excel(uploaded_file)
+    else:
+        raise TypeError("Invalid file type!")
+
+    if y_name not in data.columns:
+        raise ValueError("Target variable not in columns!")
+    if time_name not in data.columns:
+        raise ValueError("Time column name not in columns!")
+    data = correct_dtypes(data, time_name)
+    data = gen_cleaning(data, time_name)
+    return data
+    
+
+@st.cache_data()
+def feature_selection(data, x, y):
+    lasso = Lasso(alpha = 0.3)
+    lasso.fit(x, y)
+    feature_importances = abs(lasso.coef_)
+    sorted_indices = np.argsort(feature_importances)[::-1]
+    sorted_features = x.columns[sorted_indices]
+    selected_features = sorted_features[feature_importances[sorted_indices] >= 0.1]
+    selected_df = data[selected_features.to_list()]
+    return selected_df
+
+# def clear_cache():
+#     load.clear()
+#     feature_selection.clear()
+
 uploaded_file = st.sidebar.file_uploader("Choose a xlsx or csv file.")
 y_name = st.sidebar.text_input(label="Name of y variable:")
 time_name = st.sidebar.text_input(label="Name of time variable:")
-inputs_added = (uploaded_file is not None) & (y_name is not None) & (time_name is not None)
+# cache_button = st.sidebar.button(
+#     label="Click this if you have previously uploaded a file and are uploading a new one.",
+#     on_click=clear_cache())
+inputs_added = (uploaded_file is not None) & (y_name != "") & (time_name != "")
+
 
 
 
 
 if inputs_added:
-    def correct_dtypes(df: pd.DataFrame, time_name: str):
-        """
-        Correct the data types of the BO RE data. 
-        Transform Timestamp into datetime format and force all numerical data.
-        """
-        
-        if type(df) != pd.DataFrame:
-            raise TypeError("Data is not DataFrame!")
-        
-        numeric_types = (int, float)
-        
-        for col in df:
-            if col == time_name:
-                df[col] = pd.to_datetime(df[col])
-            elif df[col].dtype not in numeric_types:
-                df[col] = pd.to_numeric(df[col], errors="coerce")
-        return df
-
-
-
-    def gen_cleaning(df: pd.DataFrame, time_name):
-        """
-        General dataframe cleaning: 
-        - Drop rows were all values are NaN/NaT
-        - Drop columns with excessive NaN
-        - Interpolate missing values
-        - Remove outliers
-        - Set timestamp as index
-        """
-        df.dropna(inplace=True, how = 'all')
-        blank_cols = df.isnull().sum()[df.isnull().sum() > 10].index
-        #display(blank_cols)
-        df.drop(blank_cols, axis=1, inplace=True)
-        df = df.interpolate()
-        # df = df[df['RE test'] >= 60]
-        df.set_index(time_name, inplace=True)
-        return df
     
-    @st.cache_data()
-    def load():
-        """_summary_
-
-        Returns:
-            _type_: _description_
-        """
-        if uploaded_file.name[-4:] == ".csv":
-            data = pd.read_csv(uploaded_file)
-        elif uploaded_file.name[-5:] == ".xlsx":
-            data = pd.read_excel(uploaded_file)
-        else:
-            raise TypeError("Invalid file type!")
-        
-        if y_name not in data.columns:
-            raise ValueError("Target variable not in columns!")
-        if time_name not in data.columns:
-            raise ValueError("Time column name not in columns!")
-        data = correct_dtypes(data, time_name)
-        data = gen_cleaning(data, time_name)
-        return data
-    
-    
-    df = load()
+    df = load(uploaded_file)
     x = df.drop(y_name, axis = 1)
     y = df[y_name]
 
@@ -98,16 +118,7 @@ if inputs_added:
         st.subheader("Bogalusa Reduction Efficiency Dataset")
         st.write(df)
 
-    @st.cache_data()
-    def feature_selection(data, x, y):
-        lasso = Lasso(alpha = 0.3)
-        lasso.fit(x, y)
-        feature_importances = abs(lasso.coef_)
-        sorted_indices = np.argsort(feature_importances)[::-1]
-        sorted_features = x.columns[sorted_indices]
-        selected_features = sorted_features[feature_importances[sorted_indices] >= 0.1]
-        selected_df = data[selected_features.to_list()]
-        return selected_df
+
 
     selected_df = feature_selection(df, x, y)
     x_train, x_test, y_train, y_test = train_test_split(selected_df, y, test_size=0.3, random_state=24)
