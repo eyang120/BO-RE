@@ -52,7 +52,7 @@ def gen_cleaning(df: pd.DataFrame, time_name):
     #display(blank_cols)
     df.drop(blank_cols, axis=1, inplace=True)
     df = df.interpolate()
-    # df = df[df['RE test'] >= 60]
+    df = df[df['RE test'] >= 60]
     df.set_index(time_name, inplace=True)
     return df
 
