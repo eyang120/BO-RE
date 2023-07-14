@@ -96,7 +96,12 @@ def feature_selection(data, x, y):
 
 # inputs_added = (uploaded_file is not None) & (y_name != "") & (time_name != "")
 
-
+slider_values = {}
+def retrieve_slider_values(x_train): 
+    for i in range(len(x_train.columns)): 
+        column = x_train.columns[i] 
+        slider_values[column] = st.session_state[f"col{i}"]
+        # st.write(slider_values[column])
 
 
 y_name = "RE test"
@@ -145,6 +150,8 @@ st.sidebar.write("You can either drag the sliders or type in your desired value.
 
 last_row = df.iloc[-1].to_dict()
 
+
+
 with st.sidebar:
     for i in range(len(x_train.columns)):
         
@@ -158,6 +165,7 @@ with st.sidebar:
                         max_value=feature_max, 
                         key=f"col{i}"
                         )
+        last_row[column] = col_value
         textbox = st.number_input(f"Desired Value", value=float(st.session_state[f"col{i}"]) if f"col{i}" in st.session_state else float(col_value),
                                 min_value=feature_min,
                                 max_value=feature_max,
@@ -295,14 +303,14 @@ def random_forest(x_train, x_test, y_train, y_test):
 
 
 def svr_predict(x_train, x_test, y_train):
-    svr = SVR(kernel='rbf')
+    svr = SVR(kernel='linear')
     svr.fit(x_train, y_train)
     y_pred = svr.predict(x_test)
     st.write(f"**Predicted reduction efficiency based on slider values: {round(100 if y_pred[-1] > 100 else y_pred[-1], 2)}%**")
 
 
 def svr_model(x_train, x_test, y_train, y_test):
-    svr = SVR(kernel='rbf')
+    svr = SVR(kernel='linear')
 
     cv_mse_scores = -cross_val_score(svr, x_train, y_train, scoring='neg_mean_squared_error', cv=5)
     cv_r2_scores = cross_val_score(svr, x_train, y_train, scoring='r2', cv=5)
@@ -677,16 +685,11 @@ def xgboost(x_train, x_test, y_train, y_test):
     st.plotly_chart(fig, theme=None)
 
 
-slider_values = {}
-def retrieve_slider_values(): 
-    for i in range(len(x_train.columns)): 
-        column = x_train.columns[i] 
-        slider_values[column] = st.session_state[f"col{i}"]
-        # st.write(slider_values[column])
+
 
 run_check = st.checkbox("Run Model")
 predict_check = st.checkbox("Predict")
-retrieve_slider_values()
+retrieve_slider_values(x_train)
 new_row = pd.DataFrame(slider_values, index=["Current Slider Values"])
 st.write(new_row)
 
