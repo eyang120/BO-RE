@@ -154,7 +154,6 @@ last_row = df.iloc[-1].to_dict()
 
 with st.sidebar:
     for i in range(len(x_train.columns)):
-        
         column = x_train.columns[i]
         feature_min = float(np.min(x_train[column]) - 5.0)
         feature_max = float(np.max(x_train[column]) + 5.0)
@@ -162,15 +161,17 @@ with st.sidebar:
         col_value = st.slider(f"{str(column)}",
                         value = st.session_state[f"text{i}"] if f"text{i}" in st.session_state else last_row[column],
                         min_value=feature_min, 
-                        max_value=feature_max, 
-                        key=f"col{i}"
-                        )
-        last_row[column] = col_value
-        textbox = st.number_input(f"Desired Value", value=float(st.session_state[f"col{i}"]) if f"col{i}" in st.session_state else float(col_value),
+                        max_value=feature_max,
+                        key=f"col{i}")
+        textbox = st.number_input(f"Desired Value", 
+                                value= col_value,
                                 min_value=feature_min,
                                 max_value=feature_max,
                                 step=5.0,
                                 key=f"text{i}")
+
+
+
 
 
 def linear_predict(x_train, x_test, y_train):
